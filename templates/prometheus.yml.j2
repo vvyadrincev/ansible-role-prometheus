@@ -8,17 +8,6 @@ global:
   external_labels:
     monitor: 'master'
 
-# Add Alert rules via prometheus_rule_files variable which is basically a source list
-# (full path or relative to roles files dir) and destination dir is what we configured in the prometheus_rules_dir
-# variable
-{% if prometheus_rule_files is defined %}
-# Rule files specifies a list of files from which rules are read.
-rule_files:
-  {% for (key, value) in prometheus_rule_files.items() %}
-  - {{ prometheus_rules_dir }}/{{ value.dest }}
-  {% endfor %}
-{% endif %}
-
 {% if "alertmanager" in prometheus_components %}
 alerting:
   alertmanagers:
@@ -34,12 +23,28 @@ scrape_configs:
   scrape_interval: 10s
   scrape_timeout:  10s
   static_configs:
-    - targets: ['localhost:9090']
-# Assuming node_exporter is running / managed by this role - by default ...
-{% if "node_exporter" in prometheus_components %}
+    - targets: 
+      - localhost:9090
+
+{% if prometheus_hosts_for_listening is defined %}
+- job_name: 'all_servers'
+  scrape_interval: 10s
+  scrape_timeout: 10s
   static_configs:
-    - targets: ['{{ prometheus_node_exporter_opt_listen_ip }}:{{ prometheus_node_exporter_opt_port }}']
+    - targets:
+    {% for item in prometheus_hosts_for_listening: %}
+    - '{{ item }}:{{ prometheus_node_exporter_opt_port }}'
+    {% endfor %}
+
 {% endif %}
+
+
+# Assuming node_exporter is running / managed by this role - by default ...
+#{% if "node_exporter" in prometheus_components %}
+#  static_configs:
+#    - targets: 
+#      - '{{ prometheus_node_exporter_opt_listen_ip }}:{{ prometheus_node_exporter_opt_port }}'
+#{% endif %}
 
 {% if "pushgateway" in prometheus_components %}
 - job_name: 'pushgateway'
@@ -54,10 +59,6 @@ scrape_interval: 5s
     - files:
       - '{{ prometheus_file_sd_config_path }}/*.yml'
 {%endif %}
-
-{% if prometheus_jobs != '' %}
-{{ prometheus_jobs | to_yaml }}
-{% endif %}
 
 {% if "crate_adapter" in prometheus_components %}
 {% if prometheus_cratedb_remote_write %}

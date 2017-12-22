@@ -40,7 +40,7 @@ prometheus_crate_adapter_pkg_url: https://cdn.crate.io/downloads/dist/prometheus
 
 # default components
 prometheus_components:
-  - alertmanager
+#  - alertmanager
   - node_exporter
   - prometheus
 #  - pushgateway
@@ -85,13 +85,6 @@ prometheus_opts:
   - "log.level={{ prometheus_opt_log_level }}"
   - "web.external-url=http://{{ ansible_all_ipv4_addresses[0] }}:{{ prometheus_opt_port }}"
 
-
-prometheus_rule_files:
-  - job_name: traefik
-    scrape_interval: 10s
-    scrape_timeout: 10s
-    static_configs:
-      - targets: ['traefik.mydomain.com:8080']
 ################################################################################
 # cusom opts for config file
 prometheus_alertmanager_templates_path: /etc/prometheus/am-templates
@@ -114,6 +107,9 @@ prometheus_alertmanager_pagerduty_url: ''
 prometheus_alertmanager_opsgenie_api_host: ''
 prometheus_alertmanager_hipchat_url: ''
 prometheus_alertmanager_hipchat_auth_token: ''
+
+
+prometheus_rule_files: ''
 
 prometheus_alertmanager_default_receiever: ''
 prometheus_alertmanager_recievers:
@@ -178,6 +174,7 @@ prometheus_node_exporter_opts:
 
 ################################################################################
 # Push gateway
+
 ################################################################################
 prometheus_pushgateway_persistence_file: /var/lib/prometheus/pushgatway-data-file
 prometheus_pushgateway_persistence_interval: "5m"
@@ -209,3 +206,6 @@ prometheus_crate_adapter_opts:
   - "web.listen-address={{ prometheus_crate_adapter_opt_web_listen_address }}"
   - "log.format={{ prometheus_crate_adapter_opt_log_format }}"
   - "log.level={{ prometheus_crate_adapter_opt_log_level }}"
+
+
+prometheus_hosts_for_listening: "{{ groups['all_servers'] }}"

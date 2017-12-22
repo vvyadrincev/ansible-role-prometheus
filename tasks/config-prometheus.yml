@@ -19,27 +19,30 @@
 - debug:
     var: promtool_check_config_cmd
 
-- name: "crate additional directories"
-  file:
-    path: "{{ dirname }}"
-    state: directory
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
-    mode: 0755
-  with_items:
-    - "{{ prometheus_file_sd_config_path }}"
-    - "{{ prometheus_rules_dir }}"
-    - "{{ prometheus_alertmanager_templates_path }}"
-  loop_control:
+- block:
+  - name: "crate additional directories"
+    file:
+      path: "{{ dirname }}"
+      state: directory
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      mode: 0755
+    with_items:
+      - "{{ prometheus_file_sd_config_path }}"
+      - "{{ prometheus_rules_dir }}"
+      - "{{ prometheus_alertmanager_templates_path }}"
+    loop_control:
       loop_var: dirname
 
-- name: "set prometheus service"
-  template:
-    src: prometheus.service.j2
-    dest: "{{ prometheus_systemd_dir }}/prometheus.service"
-  notify:
-    - reload prometheus
-  when: prometheus_installation_method != 'docker'
+  - name: "set prometheus service"
+    template:
+      src: prometheus.service.j2
+      dest: "{{ prometheus_systemd_dir }}/prometheus.service"
+    notify:
+      - reload prometheus
+    when: prometheus_installation_method != 'docker'
+  
+  become: yes
 
 - block:
   - name: "Set prometheus_rule_files [=>2.0.0]"
@@ -59,15 +62,15 @@
     when: prometheus_version | version_compare('2.0.0', operator='>=')
   when: prometheus_rule_files == ''
 
-- name: "Copy rule files from playbook's, if any"
-  copy:
-    src: "{{ rule.value.src }}"
-    dest: "{{ prometheus_rules_dir }}/{{ rule.value.dest }}"
-    validate: "{{ promtool_check_rules_cmd }} %s"
-  with_dict: '{{ prometheus_rule_files }}'
-  loop_control:
-      loop_var: rule
-  when: promehtues_use_role_rules
+#- name: "Copy rule files from playbook's, if any"
+#  copy:
+#    src: "{{ rule.value.src }}"
+#    dest: "{{ prometheus_rules_dir }}/{{ rule.value.dest }}"
+#    validate: "{{ promtool_check_rules_cmd }} %s"
+#  with_dict: '{{ prometheus_rule_files }}'
+#  loop_control:
+#      loop_var: rule
+#  when: promehtues_use_role_rules
 
 - name: "Create sd_files"
   include: sd-create.yml
@@ -78,10 +81,13 @@
     loop_var: sd
   when: prometheus_static_targets is defined
 
-- name: "set prometheus config yml"
-  template:
-    src: prometheus.yml.j2
-    dest: "{{ prometheus_opt_config_file }}"
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
-    validate: "{{ promtool_check_config_cmd }} %s"
+- block:
+  - name: "set prometheus config yml"
+    template:
+      src: prometheus.yml.j2
+      dest: "{{ prometheus_opt_config_file }}"
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      validate: "{{ promtool_check_config_cmd }} %s"
+  become: yes
+

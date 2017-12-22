@@ -35,6 +35,7 @@
     - "{{ prometheus_components }}"
   when:
     - prometheus_installation_method != 'docker'
+  become: yes
 
 - name: "wait until prometheus service is up - tcp"
   wait_for:

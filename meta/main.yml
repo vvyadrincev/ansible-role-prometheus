@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  author: Haggai Philip Zagury
+  author: 
   description: Install/Configure Prometheus Monitoring solution
-  company: Tikal Knowledge
+  company: 
   license:
     - Apache
   min_ansible_version: 2.0
