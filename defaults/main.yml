@@ -20,7 +20,7 @@ prometheus_version: 2.0.0
 prometheus_pkg_url: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.{{ prometheus_linux_suffix }}.tar.gz
 
 # https://github.com/prometheus/node_exporter/releases/download/v0.15.0/node_exporter-0.15.0.{{ prometheus_linux_suffix }}.tar.gz
-prometheus_node_exporter_version: 0.15.1
+prometheus_node_exporter_version: 0.15.2
 prometheus_node_exporter_pkg_url: https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_node_exporter_version }}/node_exporter-{{ prometheus_node_exporter_version }}.{{ prometheus_linux_suffix }}.tar.gz
 
 # https://github.com/prometheus/alertmanager/releases/download/v0.9.1/alertmanager-0.9.1.{{ prometheus_linux_suffix }}.tar.gz
@@ -42,8 +42,7 @@ prometheus_crate_adapter_pkg_url: https://cdn.crate.io/downloads/dist/prometheus
 prometheus_components:
 #  - alertmanager
   - node_exporter
-  - prometheus
-#  - pushgateway
+#  - prometheus
 
 prometheus_user: prometheus
 prometheus_group: prometheus
@@ -208,4 +207,5 @@ prometheus_crate_adapter_opts:
   - "log.level={{ prometheus_crate_adapter_opt_log_level }}"
 
 
+# Servers list for listening 
 prometheus_hosts_for_listening: "{{ groups['all_servers'] }}"

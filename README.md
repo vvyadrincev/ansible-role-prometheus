@@ -8,7 +8,7 @@ Out of the box, it will install the following prometheus components:
 
   - [Prometheus](http://prometheus.io) version `2.0.0`
   - [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/) version `0.11.0`
-  - [Node exporter](https://github.com/prometheus/node_exporter) version `0.15.1`
+  - [Node exporter](https://github.com/prometheus/node_exporter) version `0.15.2`
   - [Pushgateway](https://github.com/prometheus/pushgateway) version `0.4.0`. Important [notes](https://prometheus.io/docs/practices/pushing/) on pushing over pulling.
   (still with no official release using)
   - [CrateDB adapter](https://github.com/crate/crate_adapter) version `0.1-2017100611-d24e213`
@@ -63,21 +63,6 @@ Then use the following Options:
 The tricky part below was customising the slack template see the `slack.tmpl.j2` to understand how sick this looks like but it works!
 
 ```
-prometheus_alertmanager_recievers:
-  receivers:
-    - name: 'slack'
-      slack_configs:
-      - channel: '#autobots'
-        send_resolved: true
-        api_url: https://hooks.slack.com/services/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
-        title: "{{'{{'}} template \"slack.custom.title\" . {{'}}'}}"
-        text: "{{'{{'}} template \"slack.custom.text_long\" . {{'}}'}}"
-        color: "{{ '{{' }}  if eq .Status \"firing\" {{'}}'}}danger{{'{{'}} else {{'}}'}}good{{'{{'}} end {{'}}'}}"
-        title_link: "{{ '{{' }}  template \"slack.custom.titlelink\" {{ '}}' }}"
-```
-* To define routes:
-
-```
 prometheus_alertmanager_routes:
   route:
     group_by: [ 'alertname', 'cluster', 'service' ]
@@ -106,12 +91,6 @@ prometheus_alertmanager_inhibit_rules:
         severity: 'indeterminate'
       equal: ['alertname']
 ```
-
-## TODO / WIP (Pull request anyone ? ;)
-
-* [ ] Add a Prometheus job:
-  Similar to the way the role appends a file to `rules` / `scrape_configs`
-* [ ] Add alertmanager.yml custom configurations for slack, pager_duty, victorops etc.
 
 ## Supported Customisations
 
@@ -199,4 +178,4 @@ A more complete solution would look something like:
 
 ## Author Information
 
-[Haggai Philip Zagury](http://www.tikalk.com/devops/haggai)
+vvyadrincev@gmail.com
